@@ -5,6 +5,8 @@ import { Categories, SortPopup, PizzaBlock, PizzaLoadingBlock } from '../compone
 
 import { setCategory, setSortBy } from '../redux/actions/filters'
 import { fetchPizzas } from '../redux/actions/pizzas'
+import { addPizzaToCart } from '../redux/actions/cart'
+import cart from '../redux/reducers/cart';
 
 const categoryNames = [
   'Мясные',
@@ -23,6 +25,7 @@ const sortItems = [
 function Home() {
   const dispatch = useDispatch()
   const items = useSelector(({ pizzas }) => pizzas.items)
+  const cartItems = useSelector(({ cart }) => cart.items)
   const isLoaded = useSelector(({ pizzas }) => pizzas.isLoaded)
   const { category, sortBy } = useSelector(({ filters }) => filters)
 
@@ -39,6 +42,10 @@ function Home() {
     dispatch(setSortBy(type))
   }, [])
 
+  const handleAddPizzaToCart = (obj) => {
+    dispatch(addPizzaToCart(obj))
+  }
+
   return (
     <div className="container">
       <div className="content__top">
@@ -53,7 +60,12 @@ function Home() {
       <div className="content__items">
         {
           isLoaded ? items.map((obj) =>
-            <PizzaBlock key={obj.id} isLoading={true} {...obj} />
+            <PizzaBlock
+              key={obj.id}
+              {...obj}
+              addedCount={cartItems[obj.id] && cartItems[obj.id].items.length}
+              onClickAddPizza={(obj) => handleAddPizzaToCart(obj)}
+            />
           )
           :
           Array(12)
